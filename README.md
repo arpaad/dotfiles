@@ -43,9 +43,11 @@ Toggle any plugin by commenting its line in the `plugins=(...)` array in `zsh/.z
     scripts/07-runtimes.sh          # me  · go/node/uv via mise + uv python   (long download)
     scripts/08-remove-old-go.sh     # YOU · sudo: remove old /usr/local/go (after verifying)
 
-## Session B (later)
+## Session B
 
-tmux, Neovim + LazyVim, and migrating the Claude Code CLI onto mise's node.
+- **tmux** — installed via mise (in `config.toml`). Link it: `stow -d ~/dev/dotfiles -t ~ tmux`. Prefix is `Ctrl-a`.
+- **Neovim + LazyVim** — (coming) neovim via mise; `stow nvim`; first launch bootstraps plugins.
+- `scripts/09-retire-nvm.sh` — one-time migration off nvm (not needed on a fresh machine).
 
 ## Notes
 
