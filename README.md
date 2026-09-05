@@ -27,7 +27,8 @@ Every script is **flat**: one command per line, no conditionals / loops / functi
 - prompt: `starship`
 - CLI: `fzf`, `ripgrep`, `fd`, `bat`, `eza`, `zoxide`, `delta`, `lazygit`, `yazi`, `jq`, `btop`, `tealdeer` (tldr)
 
-**Shell:** oh-my-zsh + zsh-autosuggestions + zsh-syntax-highlighting.
+**Shell:** oh-my-zsh + zsh-completions + zsh-autosuggestions + zsh-syntax-highlighting.
+Toggle any plugin by commenting its line in the `plugins=(...)` array in `zsh/.zshrc`.
 **Python interpreters:** managed by uv (`uv python install 3.14`).
 
 ## Run order — Session A (shell + runtimes)

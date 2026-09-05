@@ -3,7 +3,13 @@
 # --- oh-my-zsh ---
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME=""
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+# Feature flags: comment out a line to disable that plugin.
+plugins=(
+  git                     # git aliases + completions
+  zsh-completions         # extra completion definitions
+  zsh-autosuggestions     # ghosted suggestions from history (unsure? comment this out)
+  zsh-syntax-highlighting # colorize commands as you type — KEEP LAST
+)
 source $ZSH/oh-my-zsh.sh
 
 # --- mise: put runtimes/tools on PATH ---
