@@ -1,0 +1,9 @@
+# starship prompt · https://starship.rs/config
+# Defaults are already good; this only adds a blank line and slow-command timing.
+# For a fuller nerd-font icon set (optional), regenerate with:
+#   starship preset nerd-font-symbols -o ~/dev/dotfiles/starship/.config/starship.toml
+
+add_newline = true
+
+[cmd_duration]
+min_time = 2000

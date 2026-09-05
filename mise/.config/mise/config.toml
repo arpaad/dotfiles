@@ -1,0 +1,25 @@
+# mise · runtimes + CLI toolkit
+# Names are verified live during install with:  mise registry | grep <name>
+
+[tools]
+# runtimes (activated in Phase 2)
+node = "24"
+go   = "1.27"
+uv   = "latest"
+
+# prompt
+starship = "latest"
+
+# CLI toolkit
+fzf      = "latest"
+ripgrep  = "latest"
+fd       = "latest"
+bat      = "latest"
+eza      = "latest"
+zoxide   = "latest"
+delta    = "latest"
+lazygit  = "latest"
+yazi     = "latest"
+jq       = "latest"
+btop     = "latest"
+tealdeer = "latest"
