@@ -1,51 +1,66 @@
 # dotfiles
 
-Reproducible, terminal-centric dev environment for **WSL Ubuntu 24.04** (portable to any Linux).
-Config lives here as real files, symlinked into `~` with GNU stow.
-Binaries are never stored — they're a *recipe*: `mise/.config/mise/config.toml` (dev tools) + `scripts/` (system packages).
+A reproducible, terminal-centric dev environment: zsh + starship, mise-managed toolchains,
+tmux, and Neovim/LazyVim. Built for **WSL Ubuntu 24.04**; the only distro-specific part is
+one apt script.
 
-Every script is **flat**: one command per line, no conditionals / loops / functions — read top to bottom.
+Config lives here as real files and is symlinked into `~` with GNU stow.
+Binaries are never committed — they're a recipe that re-fetches them:
+`mise/.config/mise/config.toml` for dev tools, `scripts/` for system packages.
 
-## Reproducibility model
+## Install
 
-A system splits into two kinds of thing, and only one of them belongs in git:
+**Before you start**
 
-| | Where it lives |
-|---|---|
-| **Config** (text) | this repo, symlinked into `~` by stow — portable to any machine/distro |
-| **Binaries/tools** | never in git; a *recipe* that re-fetches them (`mise config.toml`, `scripts/`) |
-| **Secrets** (ssh keys, tokens) | separate, **never** in this repo |
-| **State/data** (history, caches, projects) | not reproduced |
+- Install a **Nerd Font** on the host and select it in the terminal — this config assumes
+  **Hack Nerd Font**. Without it, prompt and file icons render as boxes (□).
+- `scripts/05` replaces `~/.zshrc` and `~/.gitconfig`. Keep a copy if you have anything in them.
 
-**Cross-distro:** mise-managed tools are byte-identical on Ubuntu/Fedora/Arch — mise downloads its own binaries from each tool's upstream. Only the small apt layer in `scripts/` changes per distro. Nix (the future capstone) would make even that identical.
-
-## Install on a fresh machine
-
-Prerequisites, once by hand:
-- A **Nerd Font** installed on the host and selected in the terminal (this setup uses **Hack Nerd Font**). Until then, prompt and file icons render as boxes (□).
-- GitHub access to push (`gh auth login`, or an SSH key on the account).
-
-Clone to `~/.dotfiles` — the scripts assume that path:
+**Clone to `~/.dotfiles`** — the scripts assume this path:
 
     git clone https://github.com/arpaad/dotfiles.git ~/.dotfiles
 
-Then run, in order:
+**Run in order.** Scripts marked *sudo* prompt for your password.
 
-    scripts/00-backup.sh            # me  · back up ~/.bashrc
-    scripts/01-apt-base.sh          # YOU · sudo: core packages (git, make, stow, curl, unzip, zsh)
-    scripts/02-apt-system-tools.sh  # YOU · sudo: podman + newer git (ppa)
-    scripts/03-mise.sh              # me  · install mise + CLI toolkit        (long download)
-    scripts/04-ohmyzsh.sh           # me  · oh-my-zsh + plugins
-    scripts/05-link-configs.sh      # me  · stow zsh/starship/git into ~
-    scripts/06-set-login-shell.sh   # YOU · chsh to zsh, then open a NEW WSL window
-    scripts/07-runtimes.sh          # me  · go/node/uv via mise + uv python   (long download)
-    scripts/08-remove-old-go.sh     # YOU · sudo: remove old /usr/local/go (after verifying)
+    scripts/01-apt-base.sh          # sudo · core packages: git, build-essential, stow, curl, unzip, zsh
+    scripts/02-apt-system-tools.sh  # sudo · podman + newer git from ppa:git-core/ppa
+    scripts/03-mise.sh              #        install mise, link its config, fetch the CLI toolkit
+    scripts/04-ohmyzsh.sh           #        oh-my-zsh + zsh plugins
+    scripts/05-link-configs.sh      #        stow zsh, starship, git into ~
+    scripts/06-set-login-shell.sh   # sudo · chsh to zsh
 
-`scripts/09-retire-nvm.sh` was a one-time migration off nvm — **not needed on a fresh machine.**
+Then **open a new terminal** so zsh becomes your shell, and finish there:
 
-Then link the rest: `cd ~/.dotfiles && stow tmux nvim`.
+    scripts/07-runtimes.sh          #        node/go/uv via mise + the default Python
+    cd ~/.dotfiles && stow tmux nvim
 
-## Stow packages
+**Check it worked**
+
+    which zsh starship mise    # all present
+    mise ls                    # runtimes and CLI tools installed
+    ls -l ~/.zshrc             # -> .dotfiles/zsh/.zshrc
+
+Open `nvim` once to let LazyVim install its plugins. Language servers install themselves
+via Mason the first time you open a file of a new language.
+
+## What you get
+
+**System packages (apt)** — `ca-certificates`, `software-properties-common`, `curl`, `unzip`,
+`git`, `build-essential`, `stow`, `zsh`, `podman`.
+
+**Dev tools (mise)** — declared in `mise/.config/mise/config.toml`:
+
+- runtimes: `node`, `go`, `uv`
+- prompt: `starship`
+- editor & multiplexer: `neovim`, `tmux`
+- CLI: `fzf`, `ripgrep`, `fd`, `bat`, `eza`, `zoxide`, `delta`, `lazygit`, `yazi`, `jq`, `btop`, `tealdeer`
+
+**Shell** — oh-my-zsh with zsh-completions, zsh-autosuggestions, zsh-syntax-highlighting.
+
+**Python** — uv owns the interpreters (`uv python install --default 3.14`). The system
+`python3` is never touched; the OS depends on it.
+
+## Layout
 
     ~/.dotfiles/
     ├── zsh/        .zshrc
@@ -56,44 +71,22 @@ Then link the rest: `cd ~/.dotfiles && stow tmux nvim`.
     ├── nvim/       .config/nvim/
     └── scripts/    (not a stow package)
 
-The repo lives directly in `~` on purpose: stow's default target is the *parent* of the stow
-directory, so `cd ~/.dotfiles && stow zsh` needs no flags. (The scripts still pass `-d`/`-t`
-explicitly so they don't depend on the current directory.)
+Each top-level directory is a **stow package** mirroring the paths it owns under `~`.
+The repo sits directly in `~` because stow's default target is the *parent* of the stow
+directory — so `cd ~/.dotfiles && stow zsh` needs no flags. (The scripts still pass `-d`/`-t`
+explicitly so they work from any directory.)
 
-## What gets installed
+## Conventions
 
-**System packages (apt):**
-`ca-certificates`, `software-properties-common`, `curl`, `unzip`, `git`, `build-essential` (make/gcc), `stow`, `zsh`, `podman`, plus newer `git` from `ppa:git-core/ppa`.
+- **Scripts are flat.** One command per line — no conditionals, loops, or functions. Readable
+  top to bottom, and obvious where it stopped if one fails.
+- **Config is text and goes in git. Binaries never do** — they're re-fetched from the recipe.
+  Secrets (ssh keys, tokens) stay out of this repo entirely.
+- **Tools come from mise, not apt**, so binaries keep their real upstream names — `bat`, `fd`,
+  `rg`, not Debian's `batcat`/`fdfind`. That's why the alias is simply `cat='bat'`.
+- **Aliases are interactive-only**, so `#!/bin/bash` scripts are unaffected.
 
-**Dev tools (mise) — see `mise/.config/mise/config.toml`:**
-- runtimes: `node`, `go`, `uv`
-- prompt: `starship`
-- CLI: `fzf`, `ripgrep`, `fd`, `bat`, `eza`, `zoxide`, `delta`, `lazygit`, `yazi`, `jq`, `btop`, `tealdeer` (tldr)
-- also: `tmux`, `neovim`
-
-**Shell:** oh-my-zsh + zsh-completions + zsh-autosuggestions + zsh-syntax-highlighting.
-Toggle any plugin by commenting its line in the `plugins=(...)` array in `zsh/.zshrc`.
-
-**Python interpreters:** managed by uv (`uv python install 3.14`).
-
-## Design decisions (and why)
-
-| Area | Decision | Why |
-|---|---|---|
-| Distro | Stay on **Ubuntu 24.04** (WSL) | Reproducibility comes from this repo, not distro-hopping |
-| Shell | **zsh + oh-my-zsh** | Matches the work environment |
-| Prompt | **starship** | Cross-shell, single TOML file — chosen over powerlevel10k |
-| Tools | **mise-first** | One manager for runtimes + CLI; keep as little outside it as possible |
-| Python | **uv** owns interpreters | System `python3` (3.12) left untouched forever — the OS depends on it |
-| Dotfiles | plain **git repo + GNU stow** | Wanted recreate-from-repo, not live sync (so not chezmoi) |
-| Editor | **Neovim + LazyVim** | |
-| Multiplexer | **tmux** | Prefix remapped to `Ctrl-a` |
-| Endgame | **Nix + home-manager** | Deliberate future capstone (Phase 6), with mentors at work |
-
-Because tools come from **mise, not apt**, binaries keep their **real names** — `bat`, `fd`, `rg` —
-with none of Debian's renames (`batcat`, `fdfind`). So the alias is simply `cat='bat'`.
-
-## Aliases (interactive-only → `#!/bin/bash` scripts are unaffected)
+## Aliases
 
 ```zsh
 alias ls='eza --group-directories-first'
@@ -101,24 +94,29 @@ alias ll='eza -l --git --group-directories-first'
 alias la='eza -la --git --group-directories-first'
 alias lt='eza --tree --level=2'
 alias cat='bat'
-# cd  -> smart cd (zoxide), learns dirs
+# cd  -> smart cd (zoxide), learns the dirs you visit
 # cdi -> interactive fuzzy dir jump (zoxide + fzf)
 ```
 
-Escape hatch: `\ls`, `command cat`, etc. give the originals.
+Escape hatch: `\ls`, `command cat` give you the originals.
 
-## Handy
+## Changing things
 
-- **tmux** prefix `Ctrl-a` — split `Ctrl-a |` / `Ctrl-a -`, reload `Ctrl-a r`
-- **Neovim** — the first time you open a file of a new language, Mason auto-installs that LSP (one-time per language)
-- Reset zoxide DB: `rm ~/.local/share/zoxide/db.zo`
-- Roll back the login shell: `chsh -s /usr/bin/bash`
-- mise-managed tools are only on `PATH` once `mise activate` runs (it's in `zsh/.zshrc`, with `~/.local/bin` first so fresh tabs find mise)
+| To… | Do this |
+|---|---|
+| add a CLI tool or runtime | add it to `mise/.config/mise/config.toml`, run `mise install` |
+| add a system package | add it to `scripts/01` or `02` |
+| turn a zsh plugin off | comment its line in the `plugins=(...)` array in `zsh/.zshrc` |
+| link a new package | add the directory, then `cd ~/.dotfiles && stow <name>` |
+| unlink one | `cd ~/.dotfiles && stow -D <name>` |
 
-## Notes
+Edit files in this repo, never the symlinks' targets in `~` — they're the same file, but
+committing from here is what keeps the machine reproducible.
 
-- Nothing is deleted before its replacement is verified.
-- System `python3` (3.12) is never touched — the OS depends on it.
-- The full rebuild runbook and its status log (`env.plan.md`, `env.state.md`) were folded into this
-  README once the rebuild finished; they remain in git history at commit `a43ffb5` if the detailed
-  decision log is ever needed.
+## Reference
+
+- tmux prefix is `Ctrl-a` — split `Ctrl-a |` / `Ctrl-a -`, reload config `Ctrl-a r`
+- mise tools are on `PATH` only after `mise activate` runs; it's in `zsh/.zshrc`, with
+  `~/.local/bin` ahead of it so a fresh shell can find mise itself
+- reset the zoxide database: `rm ~/.local/share/zoxide/db.zo`
+- go back to bash as login shell: `chsh -s /usr/bin/bash`

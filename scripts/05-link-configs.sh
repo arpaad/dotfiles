@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Phase 1 · replace oh-my-zsh's default .zshrc with ours, move the old
-# .gitconfig aside (its content is already merged into git/.gitconfig),
-# then symlink our configs into ~ with stow.
+# Phase 1 · replace the default configs oh-my-zsh and git may have left in ~,
+# then symlink ours into place with stow.  -f so a fresh machine (where these
+# files don't exist yet) behaves the same as one that already had them.
 DOTFILES="$HOME/.dotfiles"
-rm "$HOME/.zshrc"
-mv "$HOME/.gitconfig" "$HOME/.gitconfig.pre-rebuild"
+rm -f "$HOME/.zshrc"
+rm -f "$HOME/.gitconfig"
 stow -d "$DOTFILES" -t "$HOME" zsh
 stow -d "$DOTFILES" -t "$HOME" starship
 stow -d "$DOTFILES" -t "$HOME" git
