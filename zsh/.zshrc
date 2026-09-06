@@ -1,4 +1,4 @@
-# ~/.zshrc  ·  managed in ~/dev/dotfiles, symlinked by stow
+# ~/.zshrc  ·  managed in ~/.dotfiles, symlinked by stow
 
 # --- PATH: user-local bin must come first (the mise binary lives here) ---
 export PATH="$HOME/.local/bin:$PATH"
