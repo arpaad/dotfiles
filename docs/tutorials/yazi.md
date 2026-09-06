@@ -89,6 +89,46 @@ g c           go to ~/.config
 `Z` is excellent — it knows every directory you have `cd`-ed into, so a few
 letters get you anywhere.
 
+### Dotfiles are hidden until you press `.`
+
+Out of the box this config sets `show_hidden = false`, so `.config`, `.git`,
+`.dotfiles` and every other dot-name is **invisible** — you cannot see them, and
+`l` cannot enter what you cannot put the cursor on.
+
+```
+.             show / hide hidden files — toggles, and takes effect instantly
+```
+
+That is the whole answer: **press `.` (period), and the dot-entries appear.**
+Press it again to hide them. `.` is an unmodified key on every keyboard layout,
+Hungarian included.
+
+The toggle lasts as long as the yazi session and is not remembered. To make it
+the default instead, edit `yazi/.config/yazi/yazi.toml` in this repo:
+
+```toml
+[mgr]
+show_hidden = true
+```
+
+and restart yazi — no stow re-run needed, the file is already symlinked.
+
+**Which do you want?** Leave it `false` and toggle. In a home directory or a
+repo root, hidden entries outnumber the real ones — you would spend most of your
+time scrolling past `.cache`, `.local` and `.git` to reach the four files you
+came for. `.` costs one keypress on the rare occasion you need them.
+
+Two things that work whether or not hidden files are showing:
+
+- **`g c` jumps straight into `~/.config`**, and `Z` / `z` will land you inside
+  any dot-directory by name. Jumping *to* a hidden directory is never blocked —
+  only seeing it listed one level up is.
+- Once you are **inside** `.config`, its ordinary children are visible as normal.
+  The setting hides dot-*entries*, not the contents of a dot-directory.
+
+If `s` or `S` (the recursive searches) come back empty for a file you know is
+under a dot-directory, press `.` and search again.
+
 ---
 
 ## 3 · Looking at things without opening them
@@ -99,7 +139,8 @@ This is yazi's real value for you.
 j  k          just moving the cursor previews each file as you go
 J  K          scroll the preview pane down / up (without leaving the list)
 Tab           show detailed info about the hovered file
-.             show / hide dotfiles
+.             show / hide hidden files  (see above — this is how you reach
+              anything starting with a dot)
 ```
 
 `J` and `K` are the important ones. You can read a good chunk of a file — check
@@ -266,7 +307,9 @@ Everything else — `hjkl`, `Space`, `y` `x` `p` `d` `r` `a`, `f` `s` `S`, `z` `
 
 Your config is `yazi/.config/yazi/yazi.toml` in this repo, symlinked to
 `~/.config/yazi/yazi.toml` by stow. It is deliberately small: sort order, hidden
-files off, size in the side column, and the `1:3:4` column ratio.
+files off (`show_hidden = false` — [toggle it with `.`](#dotfiles-are-hidden-until-you-press-),
+or flip the default there), size in the side column, and the `1:3:4` column
+ratio.
 
 Note that the config section is called `[mgr]`. It was renamed from `[manager]`
 in yazi 25.5, so older blog posts and Stack Overflow answers will show the old
@@ -279,13 +322,14 @@ The official book is at <https://yazi-rs.github.io> and it is short and good.
 
 ## 12 · The honest summary
 
-Learn these eight keys and you have 95% of the value:
+Learn these nine keys and you have 95% of the value:
 
 ```
 y             launch it (from the shell)
 Space y       launch it (from Neovim)
 j k h l       move around
 J K           skim the preview without opening anything (markdown is rendered)
+.             show the dotfiles (they are hidden by default)
 Enter         open in Neovim
 c c           copy the path
 q             quit

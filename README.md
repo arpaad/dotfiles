@@ -16,7 +16,9 @@ actually does.
 
 Nothing here is distro-specific except the bootstrap. It is developed on WSL
 Ubuntu, and works unchanged on Fedora, Arch or macOS — see
-**[installing](docs/install/README.md)**.
+**[installing](docs/install/README.md)**. There is also a phased plan for
+replacing that bootstrap with Nix + home-manager:
+**[migrating to Nix](docs/install/nix.md)**.
 
 ---
 
@@ -62,7 +64,8 @@ is the highest-value thing in this repo:
 | **[Theme](docs/theme/README.md)** | one palette driving nine tools, and how to change all of them at once |
 | └ [What `ls` colours mean](docs/theme/eza-colours.md) | every colour, bold and underline in a listing, decoded |
 | **[Tutorials](docs/tutorials/README.md)** | hands-on walkthroughs: [Neovim](docs/tutorials/neovim.md) · [tmux](docs/tutorials/tmux.md) · [yazi](docs/tutorials/yazi.md) · [markdown](docs/tutorials/markdown.md) |
-| **[Installing](docs/install/README.md)** | what to install by hand · [Ubuntu/WSL](docs/install/ubuntu-wsl.md) · [Fedora & others](docs/install/fedora.md) |
+| **[Installing](docs/install/README.md)** | what to install by hand · [Ubuntu/WSL](docs/install/ubuntu-wsl.md) |
+| └ [Migrating to Nix](docs/install/nix.md) | a phased plan to replace apt + mise + stow with one declarative file |
 
 ---
 
@@ -96,7 +99,7 @@ podman.
 │   ├── tools/           the catalog — what each tool is for and why
 │   ├── theme/           the palette, and the ls colour legend
 │   ├── tutorials/       hands-on walkthroughs
-│   └── install/         by-hand layer · ubuntu-wsl · fedora
+│   └── install/         by-hand layer · ubuntu-wsl · nix migration plan
 ├── zsh/          .zshrc                    ─┐
 ├── starship/     .config/starship.toml      │
 ├── mise/         .config/mise/config.toml   │

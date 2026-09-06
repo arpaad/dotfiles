@@ -14,8 +14,15 @@ is the only part that differs between distributions.
 | You are on | Go to |
 |---|---|
 | **Ubuntu / Debian**, including WSL | **[ubuntu-wsl.md](ubuntu-wsl.md)** — scripted, ~15 minutes |
-| **Fedora / RHEL**, or anything else | **[fedora.md](fedora.md)** — the same list, `dnf` names, done by hand |
+| **Fedora / RHEL / Arch / macOS** | [the by-hand layer](#the-by-hand-layer) below, then `scripts/02` onward — only step 1 changes |
+| **one setup for all of them, declarative** | **[nix.md](nix.md)** — a phased plan to replace apt + mise + stow with home-manager |
 | *just want to try the tools*, not adopt a repo | [below](#trying-it-without-adopting-anything) |
+
+Only `scripts/01-prepare.sh` is distro-specific. On anything non-Debian, install
+the seven things below with your own package manager — the names for `curl`,
+`git`, `unzip`, `zsh`, `stow` and a C toolchain are the only thing that differs
+— then run `scripts/02`, `03` and `04` exactly as written. None of them touch
+apt or need sudo.
 
 ---
 

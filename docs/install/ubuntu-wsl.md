@@ -1,9 +1,11 @@
 # Install — Ubuntu / Debian (and WSL)
 
-**This page is the Ubuntu-specific path.** On Fedora, RHEL, Arch or macOS, use
-**[fedora.md](fedora.md)** instead — only `scripts/01-prepare.sh` differs, and
-that page replaces it with six commands. For the distro-neutral list of what has
-to be installed by hand, see **[installing](README.md)**.
+**This page is the Ubuntu-specific path.** On Fedora, RHEL, Arch or macOS,
+only `scripts/01-prepare.sh` differs — swap its apt line for your package
+manager's names and run steps 2 onward unchanged. For the distro-neutral list of
+what has to be installed by hand, see **[installing](README.md)**; for the
+one-file, any-distro version of all of it, see
+**[migrating to Nix](nix.md)**.
 
 The easy path: clone, run three scripts, open a new terminal, then one last
 script. ~15 minutes, most of it downloads. Target is **WSL Ubuntu 24.04**; only
