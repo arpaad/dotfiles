@@ -28,12 +28,16 @@ eval "$(zoxide init zsh --cmd cd)"
 source <(fzf --zsh)
 
 # --- aliases (interactive only; scripts unaffected) ---
-alias ls='eza --group-directories-first'
-alias ll='eza -l --git --group-directories-first'
-alias la='eza -la --git --group-directories-first'
-alias lt='eza --tree --level=2'
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -l --icons --group-directories-first --git'
+alias la='eza -la --icons --group-directories-first --git'
+alias lt='eza -T --icons --level=2 --group-directories-first'
+alias lg='eza -l --icons --git --git-repos'   # shows repo status per folder
+
 alias cat='bat'
 
+export BAT_THEME="Catppuccin Frappe"
+export MANPAGER="sh -c 'col -bx | bat -l man -p'"
 # --- go ---
 export GOPATH="$HOME/go"
 export PATH="$GOPATH/bin:$PATH"
