@@ -22,6 +22,7 @@ lazygit  = "latest"
 yazi     = "latest"
 jq       = "latest"
 btop     = "latest"
+glow     = "latest"   # render markdown in the terminal
 tealdeer = "latest"
 tmux     = "latest"
 neovim   = "latest"

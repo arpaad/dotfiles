@@ -1,0 +1,212 @@
+# TEMPLATE — do not edit the generated file, edit this one.
+#   source:    scripts/templates/eza-theme.yml.in
+#   generated: eza/.config/eza/theme.yml   (by scripts/04-theme.sh)
+#   colours:   ~/.config/theme/palette.env  (the ROLE_* block)
+#
+# Every colour below is a ROLE, never a literal. That is what lets the whole
+# toolset be re-themed from one file without losing what anything means.
+#
+# The system is four independent signals. Full legend: docs/theme/eza-colours.md
+#
+#   HUE       = what role the thing plays        (dir / code / config / …)
+#   BOLD      = you can act on it                (enter it, run it)
+#   DIM       = you can ignore it                (generated, locked, cached)
+#   UNDERLINE = something is wrong               (broken, conflicted, unsafe)
+#   ITALIC    = it points elsewhere              (symlink)
+#
+# TWO THINGS THAT WILL BITE YOU:
+#  1. eza silently ignores theme keys it does not recognise. A typo is not an
+#     error, it just has no effect. Change something and look.
+#  2. eza MERGES this file over its own defaults, so bold/underline you did not
+#     ask for survives. That is why `is_bold: false` appears explicitly below —
+#     without it, e.g. source files inherit eza's bold and the BOLD signal
+#     stops meaning anything.
+
+colourful: true
+
+# --- what kind of filesystem object is it -----------------------------------
+filekinds:
+  normal:       { foreground: "${ROLE_PLAIN}", is_bold: false }                    # a plain file
+  directory:    { foreground: "${ROLE_DIR}", is_bold: true }     # you can cd into it
+  executable:   { foreground: "${ROLE_RUN}", is_bold: true }     # you can run it
+  symlink:      { foreground: "${ROLE_LINK}", is_italic: true }   # a pointer
+  mount_point:  { foreground: "${ROLE_MOUNT}", is_bold: true }     # another filesystem
+  pipe:         { foreground: "${ROLE_IGNORE}" }
+  socket:       { foreground: "${ROLE_IGNORE}" }
+  special:      { foreground: "${ROLE_IGNORE}" }
+  block_device: { foreground: "${ROLE_DEVICE}" }
+  char_device:  { foreground: "${ROLE_DEVICE}" }
+
+# --- broad content categories (eza's own classification) --------------------
+file_type:
+  source:     { foreground: "${ROLE_CODE}", is_bold: false }                  # code you write
+  document:   { foreground: "${ROLE_PROSE}", is_bold: false }                  # prose to read
+  image:      { foreground: "${ROLE_MEDIA}", is_bold: false }                  # ─┐
+  video:      { foreground: "${ROLE_MEDIA}", is_bold: false }                  #  ├ media: warm pinks
+  music:      { foreground: "${ROLE_MEDIA}", is_bold: false }                  # ─┘
+  compressed: { foreground: "${ROLE_ARCHIVE}", is_bold: false }                  # sealed container
+  crypto:     { foreground: "${ROLE_DANGER}", is_bold: true }   # secrets — handle with care
+  temp:       { foreground: "${ROLE_IGNORE}", is_dimmed: true, is_bold: false } # noise
+
+# --- finer meaning by extension (these override the categories above) -------
+extensions:
+  # configuration & wiring — peach: "this decides how something behaves"
+  toml:       { filename: { foreground: "${ROLE_CONFIG}" } }
+  yaml:       { filename: { foreground: "${ROLE_CONFIG}" } }
+  yml:        { filename: { foreground: "${ROLE_CONFIG}" } }
+  json:       { filename: { foreground: "${ROLE_CONFIG}" } }
+  ini:        { filename: { foreground: "${ROLE_CONFIG}" } }
+  conf:       { filename: { foreground: "${ROLE_CONFIG}" } }
+  cfg:        { filename: { foreground: "${ROLE_CONFIG}" } }
+  tf:         { filename: { foreground: "${ROLE_CONFIG}" } }
+
+  # data — sky: "this is content, not code and not config"
+  csv:        { filename: { foreground: "${ROLE_DATA}" } }
+  tsv:        { filename: { foreground: "${ROLE_DATA}" } }
+  sql:        { filename: { foreground: "${ROLE_DATA}" } }
+  db:         { filename: { foreground: "${ROLE_DATA}" } }
+  sqlite:     { filename: { foreground: "${ROLE_DATA}" } }
+  parquet:    { filename: { foreground: "${ROLE_DATA}" } }
+
+  # meant to be executed — green, whether or not the +x bit is set
+  sh:         { filename: { foreground: "${ROLE_RUN}" } }
+  bash:       { filename: { foreground: "${ROLE_RUN}" } }
+  zsh:        { filename: { foreground: "${ROLE_RUN}" } }
+  fish:       { filename: { foreground: "${ROLE_RUN}" } }
+
+  # prose
+  md:         { filename: { foreground: "${ROLE_PROSE}" } }
+  markdown:   { filename: { foreground: "${ROLE_PROSE}" } }
+  txt:        { filename: { foreground: "${ROLE_PROSE}" } }
+  rst:        { filename: { foreground: "${ROLE_PROSE}" } }
+
+  # secrets — red: never paste these anywhere
+  pem:        { filename: { foreground: "${ROLE_DANGER}", is_bold: true } }
+  key:        { filename: { foreground: "${ROLE_DANGER}", is_bold: true } }
+  crt:        { filename: { foreground: "${ROLE_DANGER}", is_bold: true } }
+
+  # generated / machine-owned — dim: do not read, do not edit
+  lock:       { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  sum:        { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  pyc:        { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  o:          { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  so:         { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  a:          { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  class:      { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  bak:        { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  swp:        { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+
+# --- exact names (highest precedence) ---------------------------------------
+filenames:
+  # entry points — bold peach: "run me to build/ship this project"
+  Makefile:             { filename: { foreground: "${ROLE_CONFIG}", is_bold: true } }
+  Justfile:             { filename: { foreground: "${ROLE_CONFIG}", is_bold: true } }
+  justfile:             { filename: { foreground: "${ROLE_CONFIG}", is_bold: true } }
+  Dockerfile:           { filename: { foreground: "${ROLE_CONFIG}", is_bold: true } }
+  Containerfile:        { filename: { foreground: "${ROLE_CONFIG}", is_bold: true } }
+  "docker-compose.yml": { filename: { foreground: "${ROLE_CONFIG}", is_bold: true } }
+
+  # start here — bold lavender
+  "README.md":    { filename: { foreground: "${ROLE_PROSE}", is_bold: true } }
+  README:         { filename: { foreground: "${ROLE_PROSE}", is_bold: true } }
+  "CHANGELOG.md": { filename: { foreground: "${ROLE_PROSE}", is_bold: true } }
+  LICENSE:        { filename: { foreground: "${ROLE_PROSE}", is_bold: true } }
+
+  # secrets living in the open — red + underline is the loudest thing here
+  ".env":       { filename: { foreground: "${ROLE_ALARM}", is_bold: true, is_underline: true } }
+  ".env.local": { filename: { foreground: "${ROLE_ALARM}", is_bold: true, is_underline: true } }
+  ".netrc":     { filename: { foreground: "${ROLE_ALARM}", is_bold: true, is_underline: true } }
+
+  # repo plumbing — quiet peach: real config, but you rarely touch it
+  ".gitignore":     { filename: { foreground: "${ROLE_CONFIG}", is_dimmed: true } }
+  ".gitattributes": { filename: { foreground: "${ROLE_CONFIG}", is_dimmed: true } }
+  ".editorconfig":  { filename: { foreground: "${ROLE_CONFIG}", is_dimmed: true } }
+
+  # generated: lockfiles and dependency/build directories
+  "go.sum":            { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  "package-lock.json": { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  "pnpm-lock.yaml":    { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  "yarn.lock":         { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  "poetry.lock":       { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  "uv.lock":           { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  "Cargo.lock":        { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  "lazy-lock.json":    { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  node_modules:        { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  ".venv":             { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  __pycache__:         { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  ".cache":            { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  dist:                { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  build:               { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+  target:              { filename: { foreground: "${ROLE_IGNORE}", is_dimmed: true } }
+
+# --- permission bits: escalate only what deserves attention -----------------
+# Read is quiet — nearly everything is readable, so it carries no information.
+# Write and execute are capabilities, so they get colour. World-writable and
+# setuid are genuine hazards, so they get the underline.
+perms:
+  user_read:          { foreground: "${ROLE_MUTED}", is_bold: false }
+  group_read:         { foreground: "${ROLE_MUTED}", is_bold: false }
+  other_read:         { foreground: "${ROLE_MUTED}", is_bold: false }
+  user_write:         { foreground: "${ROLE_CODE}", is_bold: false }
+  group_write:        { foreground: "${ROLE_CODE}" }
+  other_write:        { foreground: "${ROLE_ALARM}", is_bold: true, is_underline: true }
+  user_execute_file:  { foreground: "${ROLE_RUN}", is_bold: false, is_underline: false }
+  user_execute_other: { foreground: "${ROLE_RUN}", is_bold: false, is_underline: false }
+  group_execute:      { foreground: "${ROLE_RUN}" }
+  other_execute:      { foreground: "${ROLE_RUN}" }
+  special_user_file:  { foreground: "${ROLE_ALARM}", is_bold: true, is_underline: true }
+  special_other:      { foreground: "${ROLE_DANGER}", is_bold: true }
+  attribute:          { foreground: "${ROLE_IGNORE}" }
+
+# --- size: hue tracks how much disk it eats (no bold — that signal is reserved)
+size:
+  number_byte: { foreground: "${ROLE_FAINT}", is_bold: false }
+  number_kilo: { foreground: "${ROLE_MUTED}", is_bold: false }
+  number_mega: { foreground: "${ROLE_CODE}", is_bold: false }
+  number_giga: { foreground: "${ROLE_CONFIG}", is_bold: false }
+  number_huge: { foreground: "${ROLE_ALARM}", is_bold: false }
+  unit_byte:   { foreground: "${ROLE_FAINT}" }
+  unit_kilo:   { foreground: "${ROLE_IGNORE}" }
+  unit_mega:   { foreground: "${ROLE_IGNORE}" }
+  unit_giga:   { foreground: "${ROLE_IGNORE}" }
+  unit_huge:   { foreground: "${ROLE_IGNORE}" }
+
+# --- ownership: red means "not you, and privileged" -------------------------
+users:
+  user_you:    { foreground: "${ROLE_PLAIN}", is_bold: false }
+  user_root:   { foreground: "${ROLE_DANGER}", is_bold: true }
+  user_other:  { foreground: "${ROLE_IGNORE}", is_bold: false }
+  group_yours: { foreground: "${ROLE_MUTED}", is_bold: false }
+  group_other: { foreground: "${ROLE_IGNORE}" }
+  group_root:  { foreground: "${ROLE_DEVICE}" }
+
+links:
+  multi_link_file: { foreground: "${ROLE_CONFIG}" }   # hardlinked: edits show up elsewhere too
+
+# --- git status: the same colour language as a diff -------------------------
+git:
+  new:        { foreground: "${ROLE_ADDED}" }
+  modified:   { foreground: "${ROLE_CHANGED}" }
+  deleted:    { foreground: "${ROLE_REMOVED}" }
+  renamed:    { foreground: "${ROLE_MOVED}" }
+  typechange: { foreground: "${ROLE_CONFIG}" }
+  ignored:    { foreground: "${ROLE_FAINT}", is_dimmed: true }
+  conflicted: { foreground: "${ROLE_ALARM}", is_bold: true, is_underline: true }
+
+git_repo:
+  branch_main:  { foreground: "${ROLE_ADDED}" }
+  branch_other: { foreground: "${ROLE_CHANGED}" }
+  git_clean:    { foreground: "${ROLE_ADDED}", is_dimmed: true }
+  git_dirty:    { foreground: "${ROLE_CHANGED}", is_bold: true }
+
+# --- structure and hazards --------------------------------------------------
+punctuation:         { foreground: "${ROLE_FAINT}", is_bold: false }                    # separators, the -> arrow
+header:              { foreground: "${ROLE_HEADER}", is_bold: true }     # eza underlines this itself
+date:                { foreground: "${ROLE_MUTED}", is_bold: false }
+inode:               { foreground: "${ROLE_IGNORE}" }
+blocks:              { foreground: "${ROLE_IGNORE}" }
+octal:               { foreground: "${ROLE_MUTED}" }
+symlink_path:        { foreground: "${ROLE_LINK}", is_dimmed: true }
+broken_symlink:      { foreground: "${ROLE_DANGER}", is_bold: true, is_underline: true }
+broken_path_overlay: { foreground: "${ROLE_DANGER}", is_underline: true }
+control_char:        { foreground: "${ROLE_DANGER}", is_reverse: true }  # hidden chars in a filename

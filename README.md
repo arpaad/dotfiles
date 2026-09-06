@@ -1,138 +1,89 @@
-# dotfiles — a catalog
+# How to customise your zsh
 
-A terminal-centric dev environment: zsh + starship, mise-managed toolchains, tmux, and
-Neovim/LazyVim. Built for **WSL Ubuntu 24.04**.
+A terminal-centric development environment: **zsh + starship** for the shell,
+a **modern CLI toolkit** managed by one file, **tmux** for panes and sessions,
+and **Neovim/LazyVim** for editing — all sharing a single colour palette.
 
-This README is a **catalog** — every piece, what it does, how it got installed, and
-whether you can take it on its own. Want the whole thing on a fresh machine instead?
-→ **[INSTALL.md](INSTALL.md)**.
+This repo is the configuration itself, but it is written to be **read rather
+than installed**. Every tool has a page saying what it is for, why it was
+chosen over the obvious alternative, and what each setting in its config
+actually does.
 
-Everything here falls into one of three buckets:
+> **Already have a zsh you like?** You do not need any of this. Take the parts
+> you want — start with **[the catalog](docs/tools/README.md)**, or the
+> [ten-line version](docs/install/README.md#trying-it-without-adopting-anything)
+> that adds the toolkit to a `.zshrc` you already have.
 
-| | Bucket | What it means |
+Nothing here is distro-specific except the bootstrap. It is developed on WSL
+Ubuntu, and works unchanged on Fedora, Arch or macOS — see
+**[installing](docs/install/README.md)**.
+
+---
+
+## The toolset
+
+The organising rule: **the familiar command keeps doing the familiar thing, and
+a better tool takes over quietly underneath.**
+
+| You type | You get | What changes |
 |---|---|---|
-| **1** | [Installed by hand](#1--installed-by-hand) | System-level things a script or you install once. Not portable — tied to the OS. |
-| **2** | [Config files](#2--config-files) | Plain text, symlinked into `~` with stow. **Copy any of these anywhere.** |
-| **3** | [The mise toolset](#3--the-mise-toolset) | One TOML file lists ~15 CLI tools; `mise install` fetches them all. |
+| `ls` `ll` `la` `lt` | [eza](docs/tools/navigation.md#eza--ls-but-it-answers-more-questions) | git status per file, icons, and colours that tell you what is generated, what is a secret, and what is yours |
+| `cd` | [zoxide](docs/tools/navigation.md#zoxide--cd-that-remembers) | remembers where you go — `cd dot` reaches `~/.dotfiles` from anywhere |
+| `cat` | [bat](docs/tools/reading.md#bat--cat-with-syntax-highlighting) | syntax highlighting, line numbers, git markers |
+| `md` | [glow](docs/tools/reading.md#glow--markdown-rendered) | markdown **rendered**, not source — a new word, because it is a new thing |
+| `Ctrl-R` | [fzf](docs/tools/navigation.md#fzf--the-fuzzy-picker-everything-else-plugs-into) | fuzzy history search instead of scrolling |
+| `git diff` | [delta](docs/tools/git.md#delta) | syntax-highlighted diffs with word-level detail |
 
-No binaries are committed. The repo is a recipe that re-fetches them.
+Plus the tools that add rather than replace: `rg` (search), `fd` (find),
+`jq` (JSON), `tldr` (examples), `btop` (processes), `lazygit`, `yazi`, `tmux`
+and `nvim`.
 
----
-
-## 1 · Installed by hand
-
-These touch the machine itself, so they can't just be copied — each row says what
-installs it. Take any row on its own; they don't depend on each other except where noted.
-
-| Item | What it's for | How it's installed | Notes |
-|---|---|---|---|
-| **Nerd Font** (Hack) | glyphs for the prompt and file icons | manually, on the **host OS** — not in WSL | the only truly by-hand step; without it you get □ boxes |
-| **apt base packages** | `git`, `build-essential`, `stow`, `curl`, `unzip`, `zsh`, `ca-certificates`, `software-properties-common` | `scripts/01-prepare.sh`, step 1 (sudo) | `stow` is what links bucket 2; `build-essential` is needed by tools that compile |
-| **git from PPA** | Ubuntu 24.04 ships git 2.43; the PPA gives 2.5x | `scripts/01-prepare.sh`, step 2 (sudo) | drop this if 2.43 is fine for you |
-| **podman** | rootless containers | `scripts/01-prepare.sh`, step 2 (sudo) | independent of everything else here |
-| **mise** | version manager — installs bucket 3 | `curl https://mise.run \| sh`, in `scripts/03-install.sh` | lands in `~/.local/bin/mise` |
-| **oh-my-zsh** | zsh framework: completions, git aliases | `scripts/01-prepare.sh`, step 3 | required by `zsh/.zshrc` as written |
-| **zsh plugins** ×3 | `zsh-completions`, `zsh-autosuggestions`, `zsh-syntax-highlighting` | git-cloned into `~/.oh-my-zsh/custom/plugins` by `scripts/01-prepare.sh`, step 3 | each is optional — comment its line out of the `plugins=()` array |
-| **zsh as login shell** | so a new terminal starts in zsh | `scripts/01-prepare.sh`, step 4 → `chsh` | needs a *new login* to take effect; undo with `chsh -s /usr/bin/bash` |
-| **Python 3.14** | the default `python` / `python3` | `uv python install --default 3.14`, in `scripts/03-install.sh` | uv owns the interpreters. The system `python3` (3.12) is never touched — the OS depends on it |
-| **LazyVim plugins** | Neovim's actual plugin set | installs itself the first time you run `nvim` | pinned by `nvim/.config/nvim/lazy-lock.json` |
-| **LSP servers** | language servers for Neovim | Mason installs them on demand, per language | nothing to configure up front |
+**Colour is treated as information, not decoration.** A Go file is the same
+colour in `ls`, in `cat`, in a diff and in the editor — because all of them
+read one palette file. And in a listing, **bold** means you can act on it, dim
+means you can ignore it, underline means something is unsafe. That single idea
+is the highest-value thing in this repo:
+**[what `ls` colours mean](docs/theme/eza-colours.md)**.
 
 ---
 
-## 2 · Config files
+## Documentation
 
-Plain text, all of it portable. Each top-level directory is a **stow package** that
-mirrors the paths it owns under `~` — so `stow zsh` creates `~/.zshrc` as a symlink to
-`zsh/.zshrc` and nothing else.
-
-**Taking just one:** either `cd ~/.dotfiles && stow <package>` for a symlink, or just
-copy the file to the path in the *Lands at* column. They're ordinary files — no
-templating, no build step. The *Needs* column is what has to exist for it to work.
-
-| Package | Lands at | What it configures | Needs |
-|---|---|---|---|
-| `zsh/` | `~/.zshrc` | plugin list, `PATH`, aliases, and the `eval` lines that activate mise / starship / zoxide / fzf | oh-my-zsh + the 3 plugins; the tools it evals (comment out the lines for any you skip) |
-| `starship/` | `~/.config/starship.toml` | the prompt — blank line between prompts, timing on commands over 2s | `starship`, a Nerd Font |
-| `git/` | `~/.gitconfig` | identity, delta as pager and diff filter, `zdiff3` conflicts, `colorMoved` | `delta` (drop the `[core] pager` + `[delta]` blocks to go without) · **edit `[user]` to your own name/email** |
-| `tmux/` | `~/.config/tmux/tmux.conf` | `Ctrl-a` prefix, mouse on, 1-based numbering, vi copy mode, 10k scrollback, splits that keep the cwd | `tmux`. Fully standalone otherwise |
-| `nvim/` | `~/.config/nvim/` | a stock LazyVim starter + `lazy-lock.json` pinning plugin versions | `neovim`, `git`, a Nerd Font. Standalone |
-| `mise/` | `~/.config/mise/config.toml` | the tool list — see bucket 3 | `mise` |
-
-### What's actually in `zsh/.zshrc`
-
-```zsh
-alias ls='eza --group-directories-first'
-alias ll='eza -l --git --group-directories-first'
-alias la='eza -la --git --group-directories-first'
-alias lt='eza --tree --level=2'
-alias cat='bat'
-# cd  -> smart cd (zoxide), learns the dirs you visit
-# cdi -> interactive fuzzy dir jump (zoxide + fzf)
-# Ctrl-R history search, Ctrl-T file picker (fzf)
-```
-
-Aliases are interactive-only, so `#!/bin/bash` scripts are unaffected. Escape hatch:
-`\ls`, `command cat`.
-
-### tmux bindings worth knowing
-
-Prefix is `Ctrl-a` (tutorials say `Ctrl-b` — press `Ctrl-a` where they do).
-
-| Keys | Does |
+| | |
 |---|---|
-| `prefix v` or `prefix \|` | split side-by-side, same directory |
-| `prefix s` or `prefix -` | split top/bottom, same directory |
-| `prefix h/j/k/l` | move between panes |
-| `prefix r` | reload the config |
+| **[The catalog](docs/tools/README.md)** | **start here** — every tool: what for, why this one, and every setting explained |
+| ├ [Shell](docs/tools/shell.md) | zsh, oh-my-zsh and its four plugins, starship, every line of `.zshrc` |
+| ├ [Navigation](docs/tools/navigation.md) | eza, zoxide, fzf, fd, yazi |
+| ├ [Reading](docs/tools/reading.md) | bat, glow, ripgrep, jq, tldr, btop |
+| ├ [Git](docs/tools/git.md) | the `.gitconfig` block by block, delta, lazygit |
+| ├ [tmux](docs/tools/tmux.md) | panes and sessions, every line of `tmux.conf` |
+| ├ [Neovim](docs/tools/neovim.md) | LazyVim, the LSP set, the review workflow |
+| └ [Runtimes](docs/tools/runtimes.md) | mise, and why the toolchain is not installed from the distro |
+| **[Theme](docs/theme/README.md)** | one palette driving nine tools, and how to change all of them at once |
+| └ [What `ls` colours mean](docs/theme/eza-colours.md) | every colour, bold and underline in a listing, decoded |
+| **[Tutorials](docs/tutorials/README.md)** | hands-on walkthroughs: [Neovim](docs/tutorials/neovim.md) · [tmux](docs/tutorials/tmux.md) · [yazi](docs/tutorials/yazi.md) · [markdown](docs/tutorials/markdown.md) |
+| **[Installing](docs/install/README.md)** | what to install by hand · [Ubuntu/WSL](docs/install/ubuntu-wsl.md) · [Fedora & others](docs/install/fedora.md) |
 
 ---
 
-## 3 · The mise toolset
+## What you install by hand
 
-One file — `mise/.config/mise/config.toml` — declares everything below. `mise install`
-fetches the lot into `~/.local/share/mise`, and `mise activate` (already in `.zshrc`)
-puts them on `PATH`.
+Everything else is fetched by `mise install` from one config file. These seven
+are the layer underneath it — *what* they are and *why*; the **how** is in
+[installing](docs/install/README.md), which has the commands per distro.
 
-**Taking just some:** you don't need this repo. Install mise, then
-`mise use -g fzf ripgrep fd bat` — or copy the lines you want into your own
-`~/.config/mise/config.toml`.
-
-**Runtimes**
-
-| Tool | Version | For |
-|---|---|---|
-| `node` | 24 | JS/TS, and the npm-installed CLIs that come with it |
-| `go` | 1.27 | Go toolchain; `$GOPATH/bin` is on `PATH` via `.zshrc` |
-| `uv` | latest | Python package + interpreter manager (also installs Python itself) |
-
-**Shell & editing**
-
-| Tool | For |
+| What | Why it's needed |
 |---|---|
-| `starship` | the prompt |
-| `neovim` | editor (config in bucket 2) |
-| `tmux` | terminal multiplexer (config in bucket 2) |
+| **A Nerd Font** | the icons and prompt glyphs only exist in a patched font. Installed where your *terminal emulator* runs — on WSL, that is Windows |
+| **Base build tools** — `curl`, `git`, `unzip`, a C toolchain | mise's installer needs curl; a few tools compile |
+| **`stow`** | symlinks this repo's configs into `~`. Only if you adopt the repo |
+| **`zsh`** | the shell everything assumes |
+| **oh-my-zsh + 3 plugins** | `.zshrc` as written loads them → [Shell](docs/tools/shell.md) |
+| **`mise`** | installs the entire rest of the toolchain. No sudo — it lives in `~/.local/bin` |
+| **zsh as login shell** | `chsh`. Takes effect on the next *login*, not the next tab |
 
-**CLI toolkit** — modern replacements and daily drivers
-
-| Tool | Replaces / does | Wired into |
-|---|---|---|
-| `fzf` | fuzzy finder | `Ctrl-R`, `Ctrl-T`, `cdi` |
-| `ripgrep` (`rg`) | faster `grep` | |
-| `fd` | friendlier `find` | |
-| `bat` | `cat` with syntax highlighting | `alias cat='bat'` |
-| `eza` | `ls` with git status and icons | `ls`/`ll`/`la`/`lt` aliases |
-| `zoxide` | `cd` that learns your dirs | replaces `cd`; `cdi` for interactive |
-| `delta` | readable git diffs | git pager + diff filter |
-| `lazygit` | TUI for git | |
-| `yazi` | TUI file manager | |
-| `jq` | JSON on the command line | |
-| `btop` | `top`, but good | |
-| `tealdeer` (`tldr`) | short, example-first man pages | |
-
-Tools come from mise rather than apt so they keep their real upstream names — `bat`,
-`fd`, `rg`, not Debian's `batcat`/`fdfind`. That's why the alias is simply `cat='bat'`.
+Optional and unrelated to the rest: a newer git than your distro ships, and
+podman.
 
 ---
 
@@ -140,41 +91,60 @@ Tools come from mise rather than apt so they keep their real upstream names — 
 
 ```
 ~/.dotfiles/
-├── README.md      this catalog
-├── INSTALL.md     the run-in-order install
-├── zsh/           .zshrc                     ─┐
-├── starship/      .config/starship.toml       │
-├── mise/          .config/mise/config.toml    ├─ bucket 2: stow packages
-├── git/           .gitconfig                  │
-├── tmux/          .config/tmux/tmux.conf      │
-├── nvim/          .config/nvim/              ─┘
-└── scripts/       01-prepare, 02-setup, 03-install   (not a stow package)
+├── README.md            this page
+├── docs/
+│   ├── tools/           the catalog — what each tool is for and why
+│   ├── theme/           the palette, and the ls colour legend
+│   ├── tutorials/       hands-on walkthroughs
+│   └── install/         by-hand layer · ubuntu-wsl · fedora
+├── zsh/          .zshrc                    ─┐
+├── starship/     .config/starship.toml      │
+├── mise/         .config/mise/config.toml   │
+├── git/          .gitconfig                 │
+├── tmux/         .config/tmux/tmux.conf     ├─ stow packages: each mirrors
+├── nvim/         .config/nvim/              │  the paths it owns under ~
+├── yazi/         .config/yazi/              │
+├── eza/          .config/eza/theme.yml      │
+├── bat/          .config/bat/themes/        │
+├── lazygit/      .config/lazygit/           │
+├── theme/        .config/theme/palette.env ─┘  ← the palette everything reads
+└── scripts/      01-prepare · 02-setup · 03-install · 04-theme
 ```
 
-The repo lives directly in `~` because stow's default target is the *parent* of the stow
-directory — so `cd ~/.dotfiles && stow zsh` needs no flags. (The scripts still pass
-`-d`/`-t` explicitly so they work from any directory.)
+Each top-level directory is a **stow package**: `stow zsh` creates `~/.zshrc`
+as a symlink to `zsh/.zshrc`, and nothing else. So you can take exactly one
+package, or just copy the file — they are ordinary text with no templating.
+
+---
 
 ## Changing things
 
 | To… | Do this |
 |---|---|
+| **re-theme everything at once** | edit `theme/.config/theme/palette.env`, run `scripts/04-theme.sh`, open a new shell → [Theme](docs/theme/README.md) |
 | add a CLI tool or runtime | add it to `mise/.config/mise/config.toml`, run `mise install` |
-| add a system package | add it to `APT_BASE` or `APT_TOOLS` in `scripts/01-prepare.sh` |
 | turn a zsh plugin off | comment its line in the `plugins=(...)` array in `zsh/.zshrc` |
-| link a new package | add the directory, add its name to `PACKAGES` in `scripts/02-setup.sh`, then `cd ~/.dotfiles && stow <name>` |
+| link a new package | add the directory, add its name to `PACKAGES` in `scripts/02-setup.sh`, then `stow <name>` |
 | unlink one | `cd ~/.dotfiles && stow -D <name>` |
-| reset the zoxide database | `rm ~/.local/share/zoxide/db.zo` |
+| add a yazi plugin | `ya pkg add <owner>/<repo>` — commit the pinned rev it records, not the plugin |
+| remove all of it | [installing → removing](docs/install/README.md#removing-it) |
+
+---
 
 ## Conventions
 
-- **Three scripts, three jobs.** `01-prepare` touches the system (apt, zsh), `02-setup`
-  links this repo's configs into `~`, `03-install` fetches the mise toolchain. Nothing
-  in 02 or 03 needs sudo.
-- **Scripts are flat.** One command per line — no conditionals, loops, or functions —
-  with an `==>` echo before each step. Readable top to bottom, and obvious where it
-  stopped if one fails.
-- **Config is text and goes in git. Binaries never do** — they're re-fetched from the
-  recipe. Secrets (ssh keys, tokens) stay out of this repo entirely.
-- **Edit files in this repo, never the symlinks in `~`.** Same file either way, but
-  committing from here is what keeps the machine reproducible.
+- **Four scripts, four jobs.** `01-prepare` touches the system (apt, zsh),
+  `02-setup` links the configs into `~`, `03-install` fetches the toolchain,
+  `04-theme` applies the palette. Only 01 needs sudo, and only 01 is
+  distro-specific.
+- **Scripts are flat.** One command per line — no conditionals, loops or
+  functions — with an `==>` echo before each step. Readable top to bottom, and
+  obvious where it stopped if one fails.
+- **Config is text and goes in git. Binaries never do** — they are re-fetched
+  from the recipe, at versions pinned in `mise/.config/mise/config.toml` and
+  `nvim/.config/nvim/lazy-lock.json`. Secrets stay out entirely.
+- **Everything is a feature flag.** Nothing here is load-bearing for anything
+  else except where a page says so. Each catalog page states what breaks if you
+  remove the thing — usually nothing.
+- **Edit files in this repo, never the symlinks in `~`.** Same file either way,
+  but committing from here is what keeps the machine reproducible.
