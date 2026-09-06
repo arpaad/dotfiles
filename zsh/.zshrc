@@ -42,8 +42,27 @@ alias lg='eza -l --icons --git --git-repos'   # shows repo status per folder
 
 alias cat='bat'          # source, syntax-highlighted
 alias md='glow -p'       # markdown, rendered  (cat shows source, md shows result)
+alias cat='bat'          # source, syntax-highlighted
+alias md='glow -p'       # markdown, rendered  (cat shows source, md shows result)
 
 export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+
+# --- editor: what yazi, git, and friends open files with ---
+export EDITOR=nvim
+export VISUAL=nvim
+alias v='nvim'
+
+# --- yazi ---
+# `y` opens yazi and, on quit, drops the shell in whatever directory you ended
+# up in. Plain `yazi` works too — it just leaves the shell where it started.
+y() {
+  local tmp="$(mktemp -t yazi-cwd.XXXXXX)" cwd
+  yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd < "$tmp"
+  [ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && cd "$cwd"
+  rm -f -- "$tmp"
+}
+
 
 # --- editor: what yazi, git, and friends open files with ---
 export EDITOR=nvim
