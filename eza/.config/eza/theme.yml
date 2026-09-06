@@ -1,0 +1,212 @@
+# TEMPLATE — do not edit the generated file, edit this one.
+#   source:    scripts/templates/eza-theme.yml.in
+#   generated: eza/.config/eza/theme.yml   (by scripts/04-theme.sh)
+#   colours:   ~/.config/theme/palette.env  (the ROLE_* block)
+#
+# Every colour below is a ROLE, never a literal. That is what lets the whole
+# toolset be re-themed from one file without losing what anything means.
+#
+# The system is four independent signals. Full legend: docs/theme/eza-colours.md
+#
+#   HUE       = what role the thing plays        (dir / code / config / …)
+#   BOLD      = you can act on it                (enter it, run it)
+#   DIM       = you can ignore it                (generated, locked, cached)
+#   UNDERLINE = something is wrong               (broken, conflicted, unsafe)
+#   ITALIC    = it points elsewhere              (symlink)
+#
+# TWO THINGS THAT WILL BITE YOU:
+#  1. eza silently ignores theme keys it does not recognise. A typo is not an
+#     error, it just has no effect. Change something and look.
+#  2. eza MERGES this file over its own defaults, so bold/underline you did not
+#     ask for survives. That is why `is_bold: false` appears explicitly below —
+#     without it, e.g. source files inherit eza's bold and the BOLD signal
+#     stops meaning anything.
+
+colourful: true
+
+# --- what kind of filesystem object is it -----------------------------------
+filekinds:
+  normal:       { foreground: "#c8d3f5", is_bold: false }                    # a plain file
+  directory:    { foreground: "#82aaff", is_bold: true }     # you can cd into it
+  executable:   { foreground: "#c3e88d", is_bold: true }     # you can run it
+  symlink:      { foreground: "#b4f9f8", is_italic: true }   # a pointer
+  mount_point:  { foreground: "#41a6b5", is_bold: true }     # another filesystem
+  pipe:         { foreground: "#737aa2" }
+  socket:       { foreground: "#737aa2" }
+  special:      { foreground: "#737aa2" }
+  block_device: { foreground: "#c53b53" }
+  char_device:  { foreground: "#c53b53" }
+
+# --- broad content categories (eza's own classification) --------------------
+file_type:
+  source:     { foreground: "#ffc777", is_bold: false }                  # code you write
+  document:   { foreground: "#c099ff", is_bold: false }                  # prose to read
+  image:      { foreground: "#fca7ea", is_bold: false }                  # ─┐
+  video:      { foreground: "#fca7ea", is_bold: false }                  #  ├ media: warm pinks
+  music:      { foreground: "#fca7ea", is_bold: false }                  # ─┘
+  compressed: { foreground: "#4fd6be", is_bold: false }                  # sealed container
+  crypto:     { foreground: "#ff757f", is_bold: true }   # secrets — handle with care
+  temp:       { foreground: "#737aa2", is_dimmed: true, is_bold: false } # noise
+
+# --- finer meaning by extension (these override the categories above) -------
+extensions:
+  # configuration & wiring — peach: "this decides how something behaves"
+  toml:       { filename: { foreground: "#ff966c" } }
+  yaml:       { filename: { foreground: "#ff966c" } }
+  yml:        { filename: { foreground: "#ff966c" } }
+  json:       { filename: { foreground: "#ff966c" } }
+  ini:        { filename: { foreground: "#ff966c" } }
+  conf:       { filename: { foreground: "#ff966c" } }
+  cfg:        { filename: { foreground: "#ff966c" } }
+  tf:         { filename: { foreground: "#ff966c" } }
+
+  # data — sky: "this is content, not code and not config"
+  csv:        { filename: { foreground: "#86e1fc" } }
+  tsv:        { filename: { foreground: "#86e1fc" } }
+  sql:        { filename: { foreground: "#86e1fc" } }
+  db:         { filename: { foreground: "#86e1fc" } }
+  sqlite:     { filename: { foreground: "#86e1fc" } }
+  parquet:    { filename: { foreground: "#86e1fc" } }
+
+  # meant to be executed — green, whether or not the +x bit is set
+  sh:         { filename: { foreground: "#c3e88d" } }
+  bash:       { filename: { foreground: "#c3e88d" } }
+  zsh:        { filename: { foreground: "#c3e88d" } }
+  fish:       { filename: { foreground: "#c3e88d" } }
+
+  # prose
+  md:         { filename: { foreground: "#c099ff" } }
+  markdown:   { filename: { foreground: "#c099ff" } }
+  txt:        { filename: { foreground: "#c099ff" } }
+  rst:        { filename: { foreground: "#c099ff" } }
+
+  # secrets — red: never paste these anywhere
+  pem:        { filename: { foreground: "#ff757f", is_bold: true } }
+  key:        { filename: { foreground: "#ff757f", is_bold: true } }
+  crt:        { filename: { foreground: "#ff757f", is_bold: true } }
+
+  # generated / machine-owned — dim: do not read, do not edit
+  lock:       { filename: { foreground: "#737aa2", is_dimmed: true } }
+  sum:        { filename: { foreground: "#737aa2", is_dimmed: true } }
+  pyc:        { filename: { foreground: "#737aa2", is_dimmed: true } }
+  o:          { filename: { foreground: "#737aa2", is_dimmed: true } }
+  so:         { filename: { foreground: "#737aa2", is_dimmed: true } }
+  a:          { filename: { foreground: "#737aa2", is_dimmed: true } }
+  class:      { filename: { foreground: "#737aa2", is_dimmed: true } }
+  bak:        { filename: { foreground: "#737aa2", is_dimmed: true } }
+  swp:        { filename: { foreground: "#737aa2", is_dimmed: true } }
+
+# --- exact names (highest precedence) ---------------------------------------
+filenames:
+  # entry points — bold peach: "run me to build/ship this project"
+  Makefile:             { filename: { foreground: "#ff966c", is_bold: true } }
+  Justfile:             { filename: { foreground: "#ff966c", is_bold: true } }
+  justfile:             { filename: { foreground: "#ff966c", is_bold: true } }
+  Dockerfile:           { filename: { foreground: "#ff966c", is_bold: true } }
+  Containerfile:        { filename: { foreground: "#ff966c", is_bold: true } }
+  "docker-compose.yml": { filename: { foreground: "#ff966c", is_bold: true } }
+
+  # start here — bold lavender
+  "README.md":    { filename: { foreground: "#c099ff", is_bold: true } }
+  README:         { filename: { foreground: "#c099ff", is_bold: true } }
+  "CHANGELOG.md": { filename: { foreground: "#c099ff", is_bold: true } }
+  LICENSE:        { filename: { foreground: "#c099ff", is_bold: true } }
+
+  # secrets living in the open — red + underline is the loudest thing here
+  ".env":       { filename: { foreground: "#ff007c", is_bold: true, is_underline: true } }
+  ".env.local": { filename: { foreground: "#ff007c", is_bold: true, is_underline: true } }
+  ".netrc":     { filename: { foreground: "#ff007c", is_bold: true, is_underline: true } }
+
+  # repo plumbing — quiet peach: real config, but you rarely touch it
+  ".gitignore":     { filename: { foreground: "#ff966c", is_dimmed: true } }
+  ".gitattributes": { filename: { foreground: "#ff966c", is_dimmed: true } }
+  ".editorconfig":  { filename: { foreground: "#ff966c", is_dimmed: true } }
+
+  # generated: lockfiles and dependency/build directories
+  "go.sum":            { filename: { foreground: "#737aa2", is_dimmed: true } }
+  "package-lock.json": { filename: { foreground: "#737aa2", is_dimmed: true } }
+  "pnpm-lock.yaml":    { filename: { foreground: "#737aa2", is_dimmed: true } }
+  "yarn.lock":         { filename: { foreground: "#737aa2", is_dimmed: true } }
+  "poetry.lock":       { filename: { foreground: "#737aa2", is_dimmed: true } }
+  "uv.lock":           { filename: { foreground: "#737aa2", is_dimmed: true } }
+  "Cargo.lock":        { filename: { foreground: "#737aa2", is_dimmed: true } }
+  "lazy-lock.json":    { filename: { foreground: "#737aa2", is_dimmed: true } }
+  node_modules:        { filename: { foreground: "#737aa2", is_dimmed: true } }
+  ".venv":             { filename: { foreground: "#737aa2", is_dimmed: true } }
+  __pycache__:         { filename: { foreground: "#737aa2", is_dimmed: true } }
+  ".cache":            { filename: { foreground: "#737aa2", is_dimmed: true } }
+  dist:                { filename: { foreground: "#737aa2", is_dimmed: true } }
+  build:               { filename: { foreground: "#737aa2", is_dimmed: true } }
+  target:              { filename: { foreground: "#737aa2", is_dimmed: true } }
+
+# --- permission bits: escalate only what deserves attention -----------------
+# Read is quiet — nearly everything is readable, so it carries no information.
+# Write and execute are capabilities, so they get colour. World-writable and
+# setuid are genuine hazards, so they get the underline.
+perms:
+  user_read:          { foreground: "#828bb8", is_bold: false }
+  group_read:         { foreground: "#828bb8", is_bold: false }
+  other_read:         { foreground: "#828bb8", is_bold: false }
+  user_write:         { foreground: "#ffc777", is_bold: false }
+  group_write:        { foreground: "#ffc777" }
+  other_write:        { foreground: "#ff007c", is_bold: true, is_underline: true }
+  user_execute_file:  { foreground: "#c3e88d", is_bold: false, is_underline: false }
+  user_execute_other: { foreground: "#c3e88d", is_bold: false, is_underline: false }
+  group_execute:      { foreground: "#c3e88d" }
+  other_execute:      { foreground: "#c3e88d" }
+  special_user_file:  { foreground: "#ff007c", is_bold: true, is_underline: true }
+  special_other:      { foreground: "#ff757f", is_bold: true }
+  attribute:          { foreground: "#737aa2" }
+
+# --- size: hue tracks how much disk it eats (no bold — that signal is reserved)
+size:
+  number_byte: { foreground: "#545c7e", is_bold: false }
+  number_kilo: { foreground: "#828bb8", is_bold: false }
+  number_mega: { foreground: "#ffc777", is_bold: false }
+  number_giga: { foreground: "#ff966c", is_bold: false }
+  number_huge: { foreground: "#ff007c", is_bold: false }
+  unit_byte:   { foreground: "#545c7e" }
+  unit_kilo:   { foreground: "#737aa2" }
+  unit_mega:   { foreground: "#737aa2" }
+  unit_giga:   { foreground: "#737aa2" }
+  unit_huge:   { foreground: "#737aa2" }
+
+# --- ownership: red means "not you, and privileged" -------------------------
+users:
+  user_you:    { foreground: "#c8d3f5", is_bold: false }
+  user_root:   { foreground: "#ff757f", is_bold: true }
+  user_other:  { foreground: "#737aa2", is_bold: false }
+  group_yours: { foreground: "#828bb8", is_bold: false }
+  group_other: { foreground: "#737aa2" }
+  group_root:  { foreground: "#c53b53" }
+
+links:
+  multi_link_file: { foreground: "#ff966c" }   # hardlinked: edits show up elsewhere too
+
+# --- git status: the same colour language as a diff -------------------------
+git:
+  new:        { foreground: "#c3e88d" }
+  modified:   { foreground: "#ffc777" }
+  deleted:    { foreground: "#ff757f" }
+  renamed:    { foreground: "#65bcff" }
+  typechange: { foreground: "#ff966c" }
+  ignored:    { foreground: "#545c7e", is_dimmed: true }
+  conflicted: { foreground: "#ff007c", is_bold: true, is_underline: true }
+
+git_repo:
+  branch_main:  { foreground: "#c3e88d" }
+  branch_other: { foreground: "#ffc777" }
+  git_clean:    { foreground: "#c3e88d", is_dimmed: true }
+  git_dirty:    { foreground: "#ffc777", is_bold: true }
+
+# --- structure and hazards --------------------------------------------------
+punctuation:         { foreground: "#545c7e", is_bold: false }                    # separators, the -> arrow
+header:              { foreground: "#828bb8", is_bold: true }     # eza underlines this itself
+date:                { foreground: "#828bb8", is_bold: false }
+inode:               { foreground: "#737aa2" }
+blocks:              { foreground: "#737aa2" }
+octal:               { foreground: "#828bb8" }
+symlink_path:        { foreground: "#b4f9f8", is_dimmed: true }
+broken_symlink:      { foreground: "#ff757f", is_bold: true, is_underline: true }
+broken_path_overlay: { foreground: "#ff757f", is_underline: true }
+control_char:        { foreground: "#ff757f", is_reverse: true }  # hidden chars in a filename

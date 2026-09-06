@@ -3,7 +3,7 @@
 # No downloads, no sudo. Every file it creates in ~ is a symlink back into ~/.dotfiles.
 
 DOTFILES="$HOME/.dotfiles"
-PACKAGES="mise zsh starship git tmux nvim"
+PACKAGES="mise zsh starship git tmux nvim yazi eza theme bat lazygit"
 
 echo
 echo "==> [1/2] clear the defaults oh-my-zsh and git left behind"

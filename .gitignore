@@ -1,0 +1,8 @@
+# Third-party *code* is fetched, not committed — `ya pkg install` restores it
+# from the revisions pinned in yazi/.config/yazi/package.toml.
+yazi/.config/yazi/plugins/
+yazi/.config/yazi/flavors/
+
+# Generated theme *data* (colour values) IS committed, deliberately: it keeps the
+# repo working before scripts/04-theme.sh has ever run, and makes a theme update
+# show up as a reviewable diff. The rule is code out, config in.
